@@ -14,7 +14,7 @@ def get_train_loader(args):
         dataset = HDF5Dataset(dname, args.image_size, mode='train')
         source_datasets.append(dataset)
 
-    train_dataloader = data.DataLoader(data.ConcatDataset(source_datasets), num_workers=1,
+    train_dataloader = data.DataLoader(data.ConcatDataset(source_datasets), num_workers=0,
                                        batch_size=args.batch_size, shuffle=True, drop_last=True)
     return train_dataloader
 
@@ -27,7 +27,7 @@ def get_val_loader(args):
         dataset = HDF5Dataset(dname, args.image_size, mode='test')
         val_datasets.append(dataset)
 
-    val_dataloader = data.DataLoader(data.ConcatDataset(val_datasets), num_workers=1,
+    val_dataloader = data.DataLoader(data.ConcatDataset(val_datasets), num_workers=0,
                                        batch_size=args.batch_size, shuffle=True, drop_last=True)
 
     return val_dataloader
@@ -38,7 +38,7 @@ def get_test_loader(args):
     dname = ds_name_to_path(args.data_dir, args.target, 'test')
     dataset = HDF5Dataset(dname, args.image_size, mode='test')
 
-    test_dataloader = data.DataLoader(dataset, num_workers=1,
+    test_dataloader = data.DataLoader(dataset, num_workers=0,
                                        batch_size=args.batch_size, shuffle=True, drop_last=True)
 
     return test_dataloader
