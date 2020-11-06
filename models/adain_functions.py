@@ -23,3 +23,23 @@ def adaptive_instance_normalization(content_feat, style_feat):
     normalized_feat = (content_feat - content_mean.expand(
         size)) / content_std.expand(size)
     return normalized_feat * style_std.expand(size) + style_mean.expand(size)
+
+
+def permute_features(features, perm_idx=None):
+    N, C, H, W = features.size()
+
+    if perm_idx is None:
+        perm_idx = torch.randperm(N)
+
+    perm_features = features[perm_idx]
+
+    return perm_features
+
+
+def permuted_adain(features, alpha=0.5, perm_idx=None):
+    perm_features = permute_features(features, perm_idx)
+    t = adaptive_instance_normalization(features, perm_features)
+
+    t = alpha * t + (1 - alpha) * features
+
+    return t

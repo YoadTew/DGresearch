@@ -7,7 +7,8 @@ import torchfunc
 import numpy as np
 import random
 
-from models.resnet import resnet18_fixed, resnet18_permuted
+from models.resnet import resnet18
+from models.resnet_permute import resnet18_permuted
 from data.data_manager import get_train_loader, get_test_loader, get_val_loader
 
 pacs_datasets = ["art_painting", "cartoon", "photo", "sketch"]
@@ -28,7 +29,7 @@ def get_args():
     parser.add_argument('--pretrained', action='store_true', help='Load pretrain model')
 
     parser.add_argument('--permute', action='store_true', help='Use permuted resent')
-    parser.add_argument("--permute_precent", "-p", type=float, default=0.31, help="Permute precent")
+    parser.add_argument("--permute_precent", "-p", type=float, default=0.4, help="Permute precent")
     parser.add_argument('--use_alpha', action='store_true', help='Use alpha from beta distribution')
 
     parser.add_argument("--learning_rate", "-l", type=float, default=.001, help="Learning rate")
@@ -49,7 +50,7 @@ class Trainer:
         if args.permute:
             model = resnet18_permuted(pretrained=args.pretrained, num_classes=args.n_classes)
         else:
-            model = resnet18_fixed(pretrained=args.pretrained, num_classes=args.n_classes)
+            model = resnet18(pretrained=args.pretrained, num_classes=args.n_classes)
 
         self.model = model.to(device)
 
@@ -79,7 +80,9 @@ class Trainer:
             self.optimizer.zero_grad()
             outputs = self.model(images, self.args)
 
-            loss = self.criterion(outputs, targets)
+            classification_loss = self.criterion(outputs, targets)
+
+            loss = classification_loss
 
             if batch_idx % 30 == 1:
                 print(f'epoch:  {epoch_idx}/{self.args.epochs}, batch: {batch_idx}/{len(self.train_loader)}, loss: {loss.item()}')
